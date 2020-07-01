@@ -1,26 +1,19 @@
 import React, { useState } from "react";
-import { TextField, Grid, Button } from "@material-ui/core";
+import PropTypes from "prop-types";
+
+import TextField from "@material-ui/core/TextField";
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
 import SearchIcon from "@material-ui/icons/Search";
 
-const SearchBar = ({ onSubmit }) => {
-  const [searchPhrase, setSearchPhrase] = useState("");
+const SearchBar = ({ onSubmit, value = "" }) => {
+  const [searchPhrase, setSearchPhrase] = useState(value);
 
-  /**
-   * Form submit handler.
-   *
-   * @param {Event} event
-   */
   const onFormSubmit = async (event) => {
     event.preventDefault();
-    onSubmit(searchPhrase);
-    setSearchPhrase("");
+    searchPhrase && onSubmit(searchPhrase);
   };
 
-  /**
-   * Input change handler.
-   *
-   * @param {Event} event
-   */
   const onChange = (event) => {
     setSearchPhrase(event.target.value);
   };
@@ -28,17 +21,18 @@ const SearchBar = ({ onSubmit }) => {
   return (
     <form noValidate autoComplete="off" onSubmit={onFormSubmit}>
       <Grid container spacing={2}>
-        <Grid item sm={10}>
+        <Grid item xs={12} sm={9} md={10}>
           <TextField
             label="Enter repository name"
             type="search"
+            helperText={""}
             fullWidth
             variant="outlined"
             value={searchPhrase}
             onChange={onChange}
           />
         </Grid>
-        <Grid item sm={2} container alignItems="stretch">
+        <Grid item sm={3} md={2} container alignItems="stretch">
           <Button
             type="submit"
             variant="contained"
@@ -53,6 +47,11 @@ const SearchBar = ({ onSubmit }) => {
       </Grid>
     </form>
   );
+};
+
+SearchBar.propTypes = {
+  onSubmit: PropTypes.func,
+  value: PropTypes.string,
 };
 
 export default SearchBar;
