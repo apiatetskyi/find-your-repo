@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const RepositoryCard = ({ repository }) => {
+const RepositoryCard = React.memo(({ repository }) => {
   const classes = useStyles();
   const { html_url: url, name, owner, stargazers_count } = repository;
 
@@ -67,7 +67,7 @@ const RepositoryCard = ({ repository }) => {
       </CardActions>
     </Card>
   );
-};
+});
 
 RepositoryCard.propTypes = {
   repository: PropTypes.object.isRequired,

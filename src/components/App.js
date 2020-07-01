@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import { makeStyles } from "@material-ui/core/styles";
 
-import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
@@ -9,7 +9,7 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 
 import github from "../api/github";
 import SearchBar from "./SearchBar";
-import RepositoryCard from "./RepositoryCard";
+import RepositoryList from "./RepositoryList";
 import { getQueryParam } from "../utils";
 
 const useStyle = makeStyles((theme) => ({
@@ -61,7 +61,7 @@ const App = () => {
       `${window.location.pathname}?q=${searchPhrase}`
     );
 
-    const resonse = await github.get("/search/repositories", {
+    const response = await github.get("/search/repositories", {
       params: {
         q: searchPhrase,
         sort: "stars",
@@ -69,9 +69,11 @@ const App = () => {
       },
     });
 
-    setRepositories(resonse.data.items);
-    setTotalCount(resonse.data.total_count);
-    setLoading(false);
+    ReactDOM.unstable_batchedUpdates(() => {
+      setRepositories(response.data.items);
+      setTotalCount(response.data.total_count);
+      setLoading(false);
+    });
   };
 
   useEffect(() => {
@@ -92,23 +94,13 @@ const App = () => {
 
       {!!repositories.length && (
         <div className={classes.section}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography className={classes.sectionHeading} variant="h2">
-                Search results
-                {!!totalCount && (
-                  <span className={classes.totalCount}>
-                    Total count: {totalCount}
-                  </span>
-                )}
-              </Typography>
-            </Grid>
-            {repositories.map((repo) => (
-              <Grid key={repo.id} item xs={12} sm={6} md={4}>
-                <RepositoryCard repository={repo} />
-              </Grid>
-            ))}
-          </Grid>
+          <Typography className={classes.sectionHeading} variant="h2">
+            Search results
+            <span className={classes.totalCount}>
+              Total count: {totalCount}
+            </span>
+          </Typography>
+          <RepositoryList repositories={repositories} />
         </div>
       )}
     </Container>
