@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  Typography,
-  Container,
-  Paper,
-  LinearProgress,
-} from "@material-ui/core";
+
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import Container from "@material-ui/core/Container";
+import Paper from "@material-ui/core/Paper";
+import LinearProgress from "@material-ui/core/LinearProgress";
 
 import github from "../api/github";
 import SearchBar from "./SearchBar";
+import RepositoryCard from "./RepositoryCard";
+import { getQueryParam } from "../utils";
 
 const useStyle = makeStyles((theme) => ({
   container: {
@@ -20,9 +22,12 @@ const useStyle = makeStyles((theme) => ({
     fontWeight: theme.typography.fontWeightBold,
   },
 
+  paper: {
+    padding: theme.spacing(2),
+  },
+
   section: {
     marginTop: theme.spacing(3),
-    padding: theme.spacing(2),
   },
 
   sectionHeading: {
@@ -39,14 +44,14 @@ const useStyle = makeStyles((theme) => ({
 
 const App = () => {
   const classes = useStyle();
+
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [repositories, setRepositories] = useState([]);
+  const [order, setOrder] = useState("desc");
 
   /**
    * Fetch data from api by search phrase.
-   *
-   * @param {string} searchPhrase
    */
   const fetchData = async (searchPhrase) => {
     setLoading(true);
@@ -59,6 +64,8 @@ const App = () => {
     const resonse = await github.get("/search/repositories", {
       params: {
         q: searchPhrase,
+        sort: "stars",
+        order,
       },
     });
 
@@ -67,30 +74,43 @@ const App = () => {
     setLoading(false);
   };
 
+  useEffect(() => {
+    const searchPhrase = getQueryParam("q");
+    searchPhrase && fetchData(searchPhrase);
+  }, []);
+
   return (
     <Container className={classes.container} maxWidth="md">
       <Typography className={classes.h1} variant="h1">
         Find your repo
       </Typography>
 
-      <Paper className={classes.section}>
-        <SearchBar onSubmit={fetchData} />
+      <Paper className={`${classes.paper} ${classes.section}`}>
+        <SearchBar onSubmit={fetchData} value={getQueryParam("q") || ""} />
       </Paper>
       {loading && <LinearProgress />}
 
-      <Paper className={classes.section}>
-        <Typography className={classes.sectionHeading} variant="h2">
-          Search results
-          {!!totalCount && (
-            <span className={classes.totalCount}>
-              Total count: {totalCount}
-            </span>
-          )}
-        </Typography>
-        {repositories.map((repo) => (
-          <Typography>{repo.name}</Typography>
-        ))}
-      </Paper>
+      {!!repositories.length && (
+        <div className={classes.section}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography className={classes.sectionHeading} variant="h2">
+                Search results
+                {!!totalCount && (
+                  <span className={classes.totalCount}>
+                    Total count: {totalCount}
+                  </span>
+                )}
+              </Typography>
+            </Grid>
+            {repositories.map((repo) => (
+              <Grid key={repo.id} item xs={12} sm={6} md={4}>
+                <RepositoryCard repository={repo} />
+              </Grid>
+            ))}
+          </Grid>
+        </div>
+      )}
     </Container>
   );
 };

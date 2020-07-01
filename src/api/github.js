@@ -1,9 +1,6 @@
 import axios from "axios";
 
-/**
- * Default records per page.
- */
-const PER_PAGE = 30;
+const DEFAULT_PER_PAGE = 30;
 
 /**
  * Create configured instance of axios for github api.
@@ -14,7 +11,7 @@ const github = axios.create({
 
 github.interceptors.request.use((config) => {
   config.params = config.params || {};
-  config.params.per_page = PER_PAGE;
+  config.params.per_page = DEFAULT_PER_PAGE;
 
   return config;
 });
