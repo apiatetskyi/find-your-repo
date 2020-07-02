@@ -6,10 +6,10 @@ import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import SearchIcon from "@material-ui/icons/Search";
 
-const SearchBar = ({ onSubmit, value = "" }) => {
+const SearchBar = React.memo(({ onSubmit, value = "" }) => {
   const [searchPhrase, setSearchPhrase] = useState(value);
 
-  const onFormSubmit = async (event) => {
+  const onFormSubmit = (event) => {
     event.preventDefault();
     searchPhrase && onSubmit(searchPhrase);
   };
@@ -47,7 +47,7 @@ const SearchBar = ({ onSubmit, value = "" }) => {
       </Grid>
     </form>
   );
-};
+});
 
 SearchBar.propTypes = {
   onSubmit: PropTypes.func,
