@@ -23,9 +23,9 @@ const SearchBar = React.memo(({ onSubmit, value = "" }) => {
       <Grid container spacing={2}>
         <Grid item xs={12} sm={9} md={10}>
           <TextField
+            id="seach-field"
             label="Enter repository name"
             type="search"
-            helperText={""}
             fullWidth
             variant="outlined"
             value={searchPhrase}
