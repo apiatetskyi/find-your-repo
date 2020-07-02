@@ -3,8 +3,9 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
+import Backdrop from "@material-ui/core/Backdrop";
 import Paper from "@material-ui/core/Paper";
-import LinearProgress from "@material-ui/core/LinearProgress";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Alert from "@material-ui/lab/Alert";
 import Pagination from "@material-ui/lab/Pagination";
 
@@ -45,6 +46,11 @@ const useStyle = makeStyles((theme) => ({
 
   pagination: {
     marginTop: theme.spacing(2),
+  },
+
+  loading: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
   },
 
   sorting: {
@@ -99,7 +105,11 @@ const App = () => {
       <Paper className={`${classes.paper} ${classes.section}`}>
         <SearchBar onSubmit={onSearch} value={params.q || ""} />
       </Paper>
-      {loading && <LinearProgress className={classes.loading} />}
+      {loading && (
+        <Backdrop className={classes.loading} open={loading}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      )}
 
       {!!response.items && (
         <div className={classes.section}>
