@@ -8,32 +8,36 @@ const Sorting = React.memo(({ options = [], onChange = () => {} }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [label, setLabel] = useState(options[0].label);
 
-  const handleClick = (event) => {
+  const onButtonClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = (option) => {
-    setLabel(option.label);
+  const onClose = (option) => {
     setAnchorEl(null);
+  };
+
+  const onSelect = (option) => {
+    setLabel(option.label);
     onChange(option.order);
+    setAnchorEl(null);
   };
 
   return (
     <div>
-      <Button aria-haspopup="true" onClick={handleClick}>
+      <Button aria-haspopup="true" onClick={onButtonClick}>
         Stars: {label}
       </Button>
       <Menu
         anchorEl={anchorEl}
         keepMounted
         open={Boolean(anchorEl)}
-        onClose={handleClose}
+        onClose={onClose}
       >
         {options.map((option) => (
           <MenuItem
             key={option.label}
             onClick={() => {
-              handleClose(option);
+              onSelect(option);
             }}
           >
             {option.label}

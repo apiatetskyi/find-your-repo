@@ -6,9 +6,11 @@ import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Alert from "@material-ui/lab/Alert";
+import Pagination from "@material-ui/lab/Pagination";
 
 import github from "../api/github";
 import { defaultUrlParam, sortingOptions } from "../settings";
+import { getPagesAmount } from "../utils";
 
 import useFetch from "../hooks/useFetch";
 import useUrlParams from "../hooks/useUrlParams";
@@ -41,9 +43,11 @@ const useStyle = makeStyles((theme) => ({
     fontWeight: theme.typography.fontWeightBold,
   },
 
-  info: {
-    display: "flex",
-    alignItems: "center",
+  pagination: {
+    marginTop: theme.spacing(2),
+  },
+
+  sorting: {
     float: "right",
     fontSize: theme.typography.pxToRem(14),
     fontWeight: theme.typography.fontWeightRegular,
@@ -69,15 +73,19 @@ const App = () => {
   }, [params]);
 
   const onSearch = (searchPhrase) => {
-    updateParams({ q: searchPhrase });
+    updateParams({ q: searchPhrase, page: 1 });
   };
 
   const onSorting = (order) => {
-    updateParams({ order: order });
+    updateParams({ order: order, page: 1 });
+  };
+
+  const onPageChange = (page) => {
+    updateParams({ page });
   };
 
   return (
-    <Container className={classes.container} maxWidth="md">
+    <Container className={classes.container} maxWidth="lg">
       {errorMessage && (
         <Alert className={classes.alert} severity="warning">
           {errorMessage}
@@ -91,18 +99,29 @@ const App = () => {
       <Paper className={`${classes.paper} ${classes.section}`}>
         <SearchBar onSubmit={onSearch} value={params.q || ""} />
       </Paper>
-      {loading && <LinearProgress />}
+      {loading && <LinearProgress className={classes.loading} />}
 
       {!!response.items && (
         <div className={classes.section}>
+          <div className={classes.sorting}>
+            <Sorting options={sortingOptions} onChange={onSorting} />
+          </div>
           <Typography className={classes.sectionHeading} variant="h2">
             Search results
-            <span className={classes.info}>
-              <Sorting options={sortingOptions} onChange={onSorting} />
-              Total count: {response.total_count}
-            </span>
           </Typography>
           <RepositoryList repositories={response.items} />
+          <Pagination
+            className={classes.pagination}
+            onChange={(event, page) => {
+              onPageChange(page);
+            }}
+            count={getPagesAmount(
+              response.total_count,
+              defaultUrlParam.per_page
+            )}
+            color="primary"
+            page={parseInt(params.page, 10) || 1}
+          />
         </div>
       )}
     </Container>

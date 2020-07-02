@@ -7,16 +7,19 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import IconStars from "@material-ui/icons/Stars";
+import IconGithub from "@material-ui/icons/GitHub";
 import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
-  content: {
+  root: {
     position: "relative",
+  },
+  content: {
     padding: theme.spacing(1),
   },
   stars: {
     position: "absolute",
-    top: theme.spacing(1),
+    bottom: theme.spacing(1.5),
     right: theme.spacing(1),
 
     display: "flex",
@@ -28,9 +31,6 @@ const useStyles = makeStyles((theme) => ({
   starsIcon: {
     marginRight: theme.spacing(0.25),
   },
-  name: {
-    paddingRight: theme.typography.pxToRem(60),
-  },
 }));
 
 const RepositoryCard = React.memo(({ repository }) => {
@@ -38,9 +38,9 @@ const RepositoryCard = React.memo(({ repository }) => {
   const { html_url: url, name, owner, stargazers_count } = repository;
 
   return (
-    <Card>
+    <Card className={classes.root}>
       <CardContent className={classes.content}>
-        <Typography className={classes.name} color="primary" noWrap>
+        <Typography color="primary" noWrap>
           {name}
         </Typography>
 
@@ -61,8 +61,9 @@ const RepositoryCard = React.memo(({ repository }) => {
           href={url}
           size="small"
           target="_blank"
+          endIcon={<IconGithub />}
         >
-          View on github
+          View on
         </Button>
       </CardActions>
     </Card>

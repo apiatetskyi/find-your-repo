@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const DEFAULT_PER_PAGE = 30;
+export const DEFAULT_PER_PAGE = 30;
+export const MAX_SEARCH_RESULTS = 1000;
 
 /**
  * Create configured instance of axios for github api.

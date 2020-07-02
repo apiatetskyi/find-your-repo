@@ -19,7 +19,23 @@ const useFetch = (api, path) => {
           setLoading(false);
         });
       } catch (error) {
-        setErrorMessage("Oops! Something went wrong. Please try again later.");
+        switch (error.response.status) {
+          case 403:
+            setErrorMessage(
+              "You exceeded rate limit 30 request per minute. Please try again later."
+            );
+            break;
+          case 422:
+            setErrorMessage(
+              "Only the first 1000 search results are available."
+            );
+            break;
+          default: {
+            setErrorMessage(
+              "Oops! Something went wrong. Please try again later."
+            );
+          }
+        }
         setLoading(false);
       }
     },

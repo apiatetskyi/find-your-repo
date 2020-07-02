@@ -1,5 +1,7 @@
+import { DEFAULT_PER_PAGE } from "./api/github";
+
 export const defaultUrlParam = {
-  per_page: 30,
+  per_page: DEFAULT_PER_PAGE,
   sort: "stars",
   order: "desc",
 };
