@@ -61,6 +61,7 @@ const RepositoryCard = React.memo(({ repository }) => {
           href={url}
           size="small"
           target="_blank"
+          rel="noopener"
           endIcon={<IconGithub />}
         >
           View on
