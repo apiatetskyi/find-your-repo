@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.js": "/find-your-repo/static/js/main.d7d37baa.chunk.js",
+    "main.js.map": "/find-your-repo/static/js/main.d7d37baa.chunk.js.map",
+    "runtime-main.js": "/find-your-repo/static/js/runtime-main.625fa1de.js",
+    "runtime-main.js.map": "/find-your-repo/static/js/runtime-main.625fa1de.js.map",
+    "static/js/2.43c814c0.chunk.js": "/find-your-repo/static/js/2.43c814c0.chunk.js",
+    "static/js/2.43c814c0.chunk.js.map": "/find-your-repo/static/js/2.43c814c0.chunk.js.map",
+    "index.html": "/find-your-repo/index.html",
+    "precache-manifest.10a4ae993b49ff32eb27501ae0c5e787.js": "/find-your-repo/precache-manifest.10a4ae993b49ff32eb27501ae0c5e787.js",
+    "service-worker.js": "/find-your-repo/service-worker.js",
+    "static/js/2.43c814c0.chunk.js.LICENSE.txt": "/find-your-repo/static/js/2.43c814c0.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.625fa1de.js",
+    "static/js/2.43c814c0.chunk.js",
+    "static/js/main.d7d37baa.chunk.js"
+  ]
+}
