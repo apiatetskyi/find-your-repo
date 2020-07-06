@@ -90,13 +90,11 @@ const App = () => {
     (async () => {
       const cache = await getCache(searchQuery);
 
-      if (!isOnline) {
-        return;
-      }
-
       if (cache) {
         setResponse(cache.data);
-      } else if (params.q) {
+      }
+
+      if (params.q && isOnline) {
         const fetchedData = await fetchData(params);
 
         if (fetchedData) {
@@ -104,7 +102,7 @@ const App = () => {
         }
       }
     })();
-  }, [params, isOnline]);
+  }, [params]);
 
   useEffect(() => {
     getAllCaches().then((requests) => {
