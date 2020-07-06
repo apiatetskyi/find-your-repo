@@ -19,26 +19,28 @@ const Select = ({
   const labelId = `label-id-${getLabelId()}`;
 
   return (
-    <FormControl fullWidth>
-      <InputLabel shrink variant="outlined" id={labelId}>
-        {label}
-      </InputLabel>
-      <UISelect
-        defaultValue={options[defaultOption].value}
-        type="select"
-        variant="outlined"
-        labelId={labelId}
-        label={label}
-        displayEmpty
-        onChange={onChange}
-      >
-        {options.map(({ value, label }) => (
-          <MenuItem key={value} value={value}>
-            {label}
-          </MenuItem>
-        ))}
-      </UISelect>
-    </FormControl>
+    options.length && (
+      <FormControl fullWidth>
+        <InputLabel shrink variant="outlined" id={labelId}>
+          {label}
+        </InputLabel>
+        <UISelect
+          defaultValue={options[defaultOption].value}
+          type="select"
+          variant="outlined"
+          labelId={labelId}
+          label={label}
+          displayEmpty
+          onChange={onChange}
+        >
+          {options.map(({ value, label }) => (
+            <MenuItem key={value} value={value}>
+              {label}
+            </MenuItem>
+          ))}
+        </UISelect>
+      </FormControl>
+    )
   );
 };
 

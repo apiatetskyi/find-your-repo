@@ -121,7 +121,7 @@ const App = () => {
         })
       );
     });
-  });
+  }, [isOnline]);
 
   const onNetworkStatusChange = (event) => {
     setOnline(event.type === "online");
