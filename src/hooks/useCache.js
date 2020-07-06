@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+const MAX_CACHE_ENTRIES = 10;
+
 const useCache = (name) => {
   const [hasCache, setCache] = useState(false);
 
@@ -11,6 +13,11 @@ const useCache = (name) => {
 
   const addCache = async (request, response) => {
     const cache = await window.caches.open(name);
+    const keys = await cache.keys();
+
+    if (keys.length >= MAX_CACHE_ENTRIES) {
+      cache.delete(keys[keys.length - 1]);
+    }
 
     cache.put(request, new Response(JSON.stringify(response)));
   };
