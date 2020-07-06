@@ -31,7 +31,7 @@ const useFetch = (api, path) => {
 
           return response;
         } catch (error) {
-          setError(error.response.status);
+          setErrorMessage(setError(error.response.status));
           setLoading(false);
         }
       }
