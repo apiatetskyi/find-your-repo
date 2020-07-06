@@ -45,9 +45,11 @@ const SearchResult = ({
 
   return response.total_count > 0 ? (
     <>
-      <div className={classes.sorting}>
-        <Sorting options={sortingOptions} onChange={onSorting} />
-      </div>
+      {isOnline && (
+        <div className={classes.sorting}>
+          <Sorting options={sortingOptions} onChange={onSorting} />
+        </div>
+      )}
 
       <Typography className={classes.sectionHeading} variant="h2">
         Search results
