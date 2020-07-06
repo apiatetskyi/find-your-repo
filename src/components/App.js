@@ -1,21 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
-import { makeStyles } from "@material-ui/core/styles";
 
+import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import Backdrop from "@material-ui/core/Backdrop";
 import Paper from "@material-ui/core/Paper";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Alert from "@material-ui/lab/Alert";
-import Pagination from "@material-ui/lab/Pagination";
 
 import github from "../api/github";
-import { defaultUrlParam, sortingOptions, SEARCH_CACHE } from "../settings";
-import {
-  getPagesAmount,
-  searchParamsToObject,
-  paramsToQueryString,
-} from "../utils";
+import { defaultUrlParam, SEARCH_CACHE } from "../settings";
+import { searchParamsToObject, paramsToQueryString } from "../utils";
 
 import useFetch from "../hooks/useFetch";
 import useUrlParams from "../hooks/useUrlParams";
@@ -24,10 +19,9 @@ import useCache from "../hooks/useCache";
 import { OnlineContext } from "../context/online-context";
 
 import SearchBar from "./SearchBar";
-import Sorting from "./Sorting";
 import Select from "./Select";
 import NetworkNotification from "./NetworkNotification";
-import RepositoryList from "./RepositoryList";
+import SearchResult from "./SearchResult";
 
 const useStyle = makeStyles((theme) => ({
   container: {
@@ -47,25 +41,9 @@ const useStyle = makeStyles((theme) => ({
     marginTop: theme.spacing(3),
   },
 
-  sectionHeading: {
-    marginBottom: theme.spacing(2),
-    fontSize: theme.typography.pxToRem(18),
-    fontWeight: theme.typography.fontWeightBold,
-  },
-
-  pagination: {
-    marginTop: theme.spacing(2),
-  },
-
   loading: {
     zIndex: theme.zIndex.drawer + 1,
     color: "#fff",
-  },
-
-  sorting: {
-    float: "right",
-    fontSize: theme.typography.pxToRem(14),
-    fontWeight: theme.typography.fontWeightRegular,
   },
 
   alert: {
@@ -154,9 +132,8 @@ const App = () => {
       </Typography>
 
       <Paper className={`${classes.paper} ${classes.section}`}>
-        {isOnline ? (
-          <SearchBar onSubmit={onSearch} value={params.q || ""} />
-        ) : (
+        {isOnline && <SearchBar onSubmit={onSearch} value={params.q || ""} />}
+        {!isOnline && (
           <Select
             label="Previous search requests"
             onChange={onSearchRequestSelect}
@@ -173,27 +150,12 @@ const App = () => {
 
       {!!response.items && (
         <div className={classes.section}>
-          <div className={classes.sorting}>
-            <Sorting options={sortingOptions} onChange={onSorting} />
-          </div>
-          <Typography className={classes.sectionHeading} variant="h2">
-            Search results
-          </Typography>
-          <RepositoryList repositories={response.items} />
-          {isOnline && (
-            <Pagination
-              className={classes.pagination}
-              onChange={(event, page) => {
-                onPageChange(page);
-              }}
-              count={getPagesAmount(
-                response.total_count,
-                defaultUrlParam.per_page
-              )}
-              color="primary"
-              page={parseInt(params.page, 10) || 1}
-            />
-          )}
+          <SearchResult
+            onPaging={onPageChange}
+            onSorting={onSorting}
+            response={response}
+            currentPage={params.page}
+          />
         </div>
       )}
     </Container>

@@ -19,7 +19,7 @@ const NetworkNotification = ({ hasCache = false }) => {
 
   if (!isOnline && !hasCache) {
     content = (
-      <Alert className={classes.alert} severity="eror">
+      <Alert className={classes.alert} severity="error">
         Please check your internet connection.
       </Alert>
     );
