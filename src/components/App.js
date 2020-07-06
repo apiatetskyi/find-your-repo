@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
 import Typography from "@material-ui/core/Typography";
@@ -20,6 +20,8 @@ import {
 import useFetch from "../hooks/useFetch";
 import useUrlParams from "../hooks/useUrlParams";
 import useCache from "../hooks/useCache";
+
+import { OnlineContext } from "../context/online-context";
 
 import SearchBar from "./SearchBar";
 import Sorting from "./Sorting";
@@ -72,7 +74,6 @@ const useStyle = makeStyles((theme) => ({
 
 const App = () => {
   const classes = useStyle();
-  const [isOnline, setOnline] = useState(window.navigator.onLine);
   const [cachedRequests, setCachedRequests] = useState([]);
   const { params, updateParams } = useUrlParams(defaultUrlParam);
   const { getCache, addCache, getAllCaches } = useCache(SEARCH_CACHE);
@@ -80,6 +81,7 @@ const App = () => {
     github,
     "/search/repositories"
   );
+  const { isOnline } = useContext(OnlineContext);
 
   useEffect(() => {
     const searchQuery = paramsToQueryString(params);
@@ -88,45 +90,40 @@ const App = () => {
     (async () => {
       const cache = await getCache(searchQuery);
 
+      if (!isOnline) {
+        return;
+      }
+
       if (cache) {
         setResponse(cache.data);
       } else if (params.q) {
         const fetchedData = await fetchData(params);
-        addCache(searchQuery, fetchedData);
+
+        if (fetchedData) {
+          addCache(searchQuery, fetchedData);
+        }
       }
     })();
-  }, [params]);
-
-  useEffect(() => {
-    window.addEventListener("online", onNetworkStatusChange);
-    window.addEventListener("offline", onNetworkStatusChange);
-
-    return () => {
-      window.removeEventListener("online", onNetworkStatusChange);
-      window.removeEventListener("offline", onNetworkStatusChange);
-    };
-  }, []);
+  }, [params, isOnline]);
 
   useEffect(() => {
     getAllCaches().then((requests) => {
       setCachedRequests(
         requests.map((request) => {
           const url = new URL(request.url);
+          const page = url.searchParams.get("page");
+          const order = url.searchParams.get("order");
+          const query = url.searchParams.get("q");
 
           return {
             value: url.searchParams.toString(),
-            label: url.searchParams.get("q"),
+            label: `${query} (page: ${page}; order: ${order})`,
             request: request,
           };
         })
       );
     });
   }, [isOnline]);
-
-  const onNetworkStatusChange = (event) => {
-    setOnline(event.type === "online");
-  };
-
   const onSearch = (searchPhrase) => {
     updateParams({ q: searchPhrase, page: 1 });
   };
@@ -188,18 +185,20 @@ const App = () => {
             Search results
           </Typography>
           <RepositoryList repositories={response.items} />
-          <Pagination
-            className={classes.pagination}
-            onChange={(event, page) => {
-              onPageChange(page);
-            }}
-            count={getPagesAmount(
-              response.total_count,
-              defaultUrlParam.per_page
-            )}
-            color="primary"
-            page={parseInt(params.page, 10) || 1}
-          />
+          {isOnline && (
+            <Pagination
+              className={classes.pagination}
+              onChange={(event, page) => {
+                onPageChange(page);
+              }}
+              count={getPagesAmount(
+                response.total_count,
+                defaultUrlParam.per_page
+              )}
+              color="primary"
+              page={parseInt(params.page, 10) || 1}
+            />
+          )}
         </div>
       )}
     </Container>
