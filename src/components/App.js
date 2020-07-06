@@ -26,6 +26,7 @@ import { OnlineContext } from "../context/online-context";
 import SearchBar from "./SearchBar";
 import Sorting from "./Sorting";
 import Select from "./Select";
+import NetworkNotification from "./NetworkNotification";
 import RepositoryList from "./RepositoryList";
 
 const useStyle = makeStyles((theme) => ({
@@ -85,7 +86,6 @@ const App = () => {
 
   useEffect(() => {
     const searchQuery = paramsToQueryString(params);
-    getAllCaches();
 
     (async () => {
       const cache = await getCache(searchQuery);
@@ -122,6 +122,7 @@ const App = () => {
       );
     });
   }, [isOnline]);
+
   const onSearch = (searchPhrase) => {
     updateParams({ q: searchPhrase, page: 1 });
   };
@@ -146,12 +147,7 @@ const App = () => {
         </Alert>
       )}
 
-      {!isOnline && (
-        <Alert className={classes.alert} severity="warning">
-          You are working in offline mode. Only previous 10 search requests are
-          available.
-        </Alert>
-      )}
+      <NetworkNotification hasCache={cachedRequests.length} />
 
       <Typography className={classes.h1} variant="h1">
         Find your repo
@@ -168,6 +164,7 @@ const App = () => {
           />
         )}
       </Paper>
+
       {loading && (
         <Backdrop className={classes.loading} open={loading}>
           <CircularProgress color="inherit" />
