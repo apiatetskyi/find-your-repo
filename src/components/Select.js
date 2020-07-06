@@ -24,7 +24,7 @@ const Select = ({
         {label}
       </InputLabel>
       <UISelect
-        defaultValue={(options[defaultOption].value = "")}
+        defaultValue={options[defaultOption].value}
         type="select"
         variant="outlined"
         labelId={labelId}
