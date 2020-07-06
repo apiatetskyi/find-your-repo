@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
 import Typography from "@material-ui/core/Typography";
@@ -10,14 +10,20 @@ import Alert from "@material-ui/lab/Alert";
 import Pagination from "@material-ui/lab/Pagination";
 
 import github from "../api/github";
-import { defaultUrlParam, sortingOptions } from "../settings";
-import { getPagesAmount } from "../utils";
+import { defaultUrlParam, sortingOptions, SEARCH_CACHE } from "../settings";
+import {
+  getPagesAmount,
+  searchParamsToObject,
+  paramsToQueryString,
+} from "../utils";
 
 import useFetch from "../hooks/useFetch";
 import useUrlParams from "../hooks/useUrlParams";
+import useCache from "../hooks/useCache";
 
 import SearchBar from "./SearchBar";
 import Sorting from "./Sorting";
+import Select from "./Select";
 import RepositoryList from "./RepositoryList";
 
 const useStyle = makeStyles((theme) => ({
@@ -66,17 +72,60 @@ const useStyle = makeStyles((theme) => ({
 
 const App = () => {
   const classes = useStyle();
+  const [isOnline, setOnline] = useState(window.navigator.onLine);
+  const [cachedRequests, setCachedRequests] = useState([]);
   const { params, updateParams } = useUrlParams(defaultUrlParam);
-  const { loading, response, errorMessage, fetchData } = useFetch(
+  const { getCache, addCache, getAllCaches } = useCache(SEARCH_CACHE);
+  const { loading, response, errorMessage, fetchData, setResponse } = useFetch(
     github,
     "/search/repositories"
   );
 
   useEffect(() => {
-    if (params.q) {
-      fetchData(params);
-    }
+    const searchQuery = paramsToQueryString(params);
+    getAllCaches();
+
+    (async () => {
+      const cache = await getCache(searchQuery);
+
+      if (cache) {
+        setResponse(cache.data);
+      } else if (params.q) {
+        const fetchedData = await fetchData(params);
+        addCache(searchQuery, fetchedData);
+      }
+    })();
   }, [params]);
+
+  useEffect(() => {
+    window.addEventListener("online", onNetworkStatusChange);
+    window.addEventListener("offline", onNetworkStatusChange);
+
+    return () => {
+      window.removeEventListener("online", onNetworkStatusChange);
+      window.removeEventListener("offline", onNetworkStatusChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    getAllCaches().then((requests) => {
+      setCachedRequests(
+        requests.map((request) => {
+          const url = new URL(request.url);
+
+          return {
+            value: url.searchParams.toString(),
+            label: url.searchParams.get("q"),
+            request: request,
+          };
+        })
+      );
+    });
+  });
+
+  const onNetworkStatusChange = (event) => {
+    setOnline(event.type === "online");
+  };
 
   const onSearch = (searchPhrase) => {
     updateParams({ q: searchPhrase, page: 1 });
@@ -90,6 +139,10 @@ const App = () => {
     updateParams({ page });
   };
 
+  const onSearchRequestSelect = (event) => {
+    updateParams(searchParamsToObject(new URLSearchParams(event.target.value)));
+  };
+
   return (
     <Container className={classes.container} maxWidth="lg">
       {errorMessage && (
@@ -98,12 +151,27 @@ const App = () => {
         </Alert>
       )}
 
+      {!isOnline && (
+        <Alert className={classes.alert} severity="warning">
+          You are working in offline mode. Only previous 10 search requests are
+          available.
+        </Alert>
+      )}
+
       <Typography className={classes.h1} variant="h1">
         Find your repo
       </Typography>
 
       <Paper className={`${classes.paper} ${classes.section}`}>
-        <SearchBar onSubmit={onSearch} value={params.q || ""} />
+        {isOnline ? (
+          <SearchBar onSubmit={onSearch} value={params.q || ""} />
+        ) : (
+          <Select
+            label="Previous search requests"
+            onChange={onSearchRequestSelect}
+            options={cachedRequests}
+          />
+        )}
       </Paper>
       {loading && (
         <Backdrop className={classes.loading} open={loading}>

@@ -1,13 +1,6 @@
 import { useState } from "react";
 
-const parseUrlParams = () => {
-  const params = new URLSearchParams(window.location.search);
-
-  return [...params.entries()].reduce((params, [key, value]) => {
-    params[key] = value;
-    return params;
-  }, {});
-};
+import { searchParamsToObject } from "../utils";
 
 const isSameParams = (prevParams, params) => {
   return Object.keys(params).every(
@@ -17,7 +10,7 @@ const isSameParams = (prevParams, params) => {
 
 const useUrlParams = (defaultParams) => {
   const [params, setParams] = useState({
-    ...parseUrlParams(),
+    ...searchParamsToObject(new URLSearchParams(window.location.search)),
     ...defaultParams,
   });
 

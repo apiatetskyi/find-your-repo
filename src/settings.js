@@ -1,5 +1,7 @@
 import { DEFAULT_PER_PAGE } from "./api/github";
 
+export const SEARCH_CACHE = "search-cache";
+
 export const defaultUrlParam = {
   per_page: DEFAULT_PER_PAGE,
   sort: "stars",
