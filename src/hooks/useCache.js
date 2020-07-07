@@ -12,6 +12,10 @@ const useCache = (name) => {
   }, []);
 
   const addCache = async (request, response) => {
+    if (!hasCache) {
+      return;
+    }
+
     const cache = await window.caches.open(name);
     const keys = await cache.keys();
 
@@ -23,6 +27,10 @@ const useCache = (name) => {
   };
 
   const getCache = async (request) => {
+    if (!hasCache) {
+      return null;
+    }
+
     const cache = await window.caches.open(name);
     const cachedResponse = await cache.match(request);
 
@@ -30,6 +38,10 @@ const useCache = (name) => {
   };
 
   const getAllCaches = async () => {
+    if (!hasCache) {
+      return [];
+    }
+
     const cache = await window.caches.open(name);
 
     return cache ? await cache.keys() : [];
